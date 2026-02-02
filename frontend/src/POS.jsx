@@ -234,15 +234,13 @@ export default function POS() {
                         <div className="logo">O</div>
                         <div>
                             <h1>OSON POS</h1>
-                            <p>SUPER FAST • Мағозаи омехта</p>
+                            <button className="btn btnLogout" onClick={logout} aria-label="Logout">
+                                <span className="text">Баромадан</span>
+                            </button>
                         </div>
                     </div>
 
                     <div style={{ display: "flex", gap: 8 }}>
-                        <button className="btn btnDanger" onClick={logout}>
-                            Баромадан
-                        </button>
-
                         <button className="btn" onClick={loadAll}>
                             ⟳ Навсозӣ
                         </button>
