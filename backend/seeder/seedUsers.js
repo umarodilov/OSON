@@ -27,7 +27,7 @@ async function upsertUser({ username, password, role, name }) {
 async function main() {
     await mongoose.connect(process.env.MONGO_URI);
     await upsertUser({ username: "admin", password: "Admin12345", role: "admin", name: "Admin" });
-    await upsertUser({ username: "cashier", password: "User12345", role: "user", name: "Cashier" });
+    await upsertUser({ username: "user", password: "User12345", role: "user", name: "User" });
     await mongoose.disconnect();
 }
 

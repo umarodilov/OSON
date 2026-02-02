@@ -1,58 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "./AdminLayout.jsx";
 
-function Dashboard() {
-    return (
-        <div className="card">
-            <div className="cardTitle">
-                <b>Dashboard</b><span className="muted">Admin</span>
-            </div>
-            <div className="muted">Инҷо: статистика, low-stock, debts…</div>
-        </div>
-    );
-}
-
-function Products() {
-    return (
-        <div className="card">
-            <div className="cardTitle">
-                <b>Products</b>
-                <button className="btn btnPrimary">+ Add</button>
-            </div>
-            <div className="muted">CRUD-и маҳсулотҳо баъд илова мекунем</div>
-        </div>
-    );
-}
-
-function Categories() {
-    return (
-        <div className="card">
-            <div className="cardTitle">
-                <b>Categories</b>
-                <button className="btn btnPrimary">+ Add</button>
-            </div>
-            <div className="muted">CRUD-и категорияҳо</div>
-        </div>
-    );
-}
-
-function Sales() {
-    return (
-        <div className="card">
-            <div className="cardTitle"><b>Sales</b></div>
-            <div className="muted">Рӯйхати фурӯшҳо</div>
-        </div>
-    );
-}
-
-function Users() {
-    return (
-        <div className="card">
-            <div className="cardTitle"><b>Users</b></div>
-            <div className="muted">Admin метавонад user-ҳоро идора кунад</div>
-        </div>
-    );
-}
+import Dashboard from "./pages/Dashboard.jsx";
+import Products from "./pages/Products.jsx";
+import Categories from "./pages/Categories.jsx";
+import Sales from "./pages/Sales.jsx";
+import Users from "./pages/Users.jsx";
 
 export default function AdminApp() {
     return (

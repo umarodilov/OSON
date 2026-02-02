@@ -6,6 +6,18 @@ import { requireAuth } from "../middleware/auth.js";
 const router = express.Router();
 const n = (x) => Number(x || 0);
 
+// ✅ GET list of sales: /api/sales
+router.get("/", requireAuth, async (req, res) => {
+    try {
+        const sales = await Sale.find().sort({ createdAt: -1 }).limit(200);
+        res.json(sales);
+    } catch (e) {
+        console.error("SALES GET ERROR:", e);
+        res.status(500).json({ message: e.message || "Server error" });
+    }
+});
+
+// ✅ CREATE sale: POST /api/sales
 router.post("/", requireAuth, async (req, res) => {
     try {
         const {
@@ -87,8 +99,7 @@ router.post("/", requireAuth, async (req, res) => {
                 txnId: p?.txnId ? String(p.txnId) : "",
             }))
             .filter(
-                (p) =>
-                    ["cash", "dc", "card", "alif"].includes(p.method) && p.amount > 0
+                (p) => ["cash", "dc", "card", "alif"].includes(p.method) && p.amount > 0
             );
 
         const paidTotal = payList.reduce((s, p) => s + n(p.amount), 0);
@@ -104,9 +115,12 @@ router.post("/", requireAuth, async (req, res) => {
         if (balance > 0 && paidTotal > 0) status = "partial";
         if (balance > 0 && paidTotal === 0) status = "credit";
 
-        // Агар насия бошад → барои тартиб: ҳадди ақал телефон/ном талаб кун (ихтиёрӣ)
+        // Агар насия бошад → ҳадди ақал телефон/ном талаб кун
         if (status !== "paid") {
-            if (!String(customerName || "").trim() || !String(customerPhone || "").trim()) {
+            if (
+                !String(customerName || "").trim() ||
+                !String(customerPhone || "").trim()
+            ) {
                 return res.status(400).json({
                     message: "Барои насия: customerName ва customerPhone ҳатмист.",
                 });
@@ -128,7 +142,6 @@ router.post("/", requireAuth, async (req, res) => {
         }
 
         // 6) Сабти sale
-        // Барои payments-и ибтидоӣ ҳам "receivedBy" мегузорем
         const paymentsWithReceiver = payList.map((p) => ({
             ...p,
             receivedById: createdById,
@@ -168,7 +181,7 @@ router.post("/", requireAuth, async (req, res) => {
     }
 });
 
-// Пардохти қарз: /api/sales/:id/pay
+// ✅ PAY debt: POST /api/sales/:id/pay
 router.post("/:id/pay", requireAuth, async (req, res) => {
     try {
         const { method = "cash", amount = 0, txnId = "" } = req.body || {};
@@ -177,6 +190,7 @@ router.post("/:id/pay", requireAuth, async (req, res) => {
 
         const receivedById = req.user?.id;
         const receivedByUsername = req.user?.username || "";
+        const receivedByRole = req.user?.role || "user";
 
         if (!receivedById) return res.status(401).json({ message: "No token" });
 
@@ -187,6 +201,14 @@ router.post("/:id/pay", requireAuth, async (req, res) => {
 
         const sale = await Sale.findById(req.params.id);
         if (!sale) return res.status(404).json({ message: "Sale ёфт нашуд" });
+
+        // ✅ FIX: sale-ҳои кӯҳна метавонанд createdById надошта бошанд.
+        // Вақте save мекунем, mongoose validate мекунад ва 500 медиҳад.
+        if (!sale.createdById) {
+            sale.createdById = receivedById;
+            sale.createdByUsername = receivedByUsername;
+            sale.createdByRole = receivedByRole;
+        }
 
         if (sale.balance <= 0) {
             return res
