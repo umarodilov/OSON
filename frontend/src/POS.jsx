@@ -89,6 +89,11 @@ export default function POS() {
 
     const overpaid = useMemo(() => paidFront > total, [paidFront, total]);
 
+    function logout() {
+        localStorage.removeItem("token");   // ё номи токени ту
+        localStorage.removeItem("user");    // агар user нигоҳ дорӣ
+        window.location.href = "/login";    // ё navigate("/login")
+    }
     function addToCart(p) {
         setCart((prev) => {
             const ex = prev.find((x) => x._id === p._id);
@@ -234,9 +239,14 @@ export default function POS() {
                     </div>
 
                     <div style={{ display: "flex", gap: 8 }}>
+                        <button className="btn btnDanger" onClick={logout}>
+                            Баромадан
+                        </button>
+
                         <button className="btn" onClick={loadAll}>
                             ⟳ Навсозӣ
                         </button>
+
                         <button className="btn" onClick={clearCart}>
                             🧺 Тоза
                         </button>
